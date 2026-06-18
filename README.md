@@ -29,7 +29,15 @@ Phishing-Website-Detection/
 ├── requirements.txt
 └── README.md
 ```
+## Application Screenshots
 
+### Home Page
+
+![Home Page](images/home-page.png)
+
+### Detection Result
+
+![Detection Result](images/detection-result.png)
 ## Installation
 
 ```bash
