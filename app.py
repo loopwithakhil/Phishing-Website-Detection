@@ -1,76 +1,106 @@
 import streamlit as st
 import pickle
-import pandas as pd
 
 from feature_extractor import extract_features
 
+# Page settings
+st.set_page_config(
+    page_title="Phishing Website Detector",
+    page_icon="🛡️",
+    layout="centered"
+)
+
+# Custom CSS
+st.markdown("""
+<style>
+.main {
+    padding-top: 2rem;
+}
+
+.title {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.subtitle {
+    text-align: center;
+    color: gray;
+    margin-bottom: 2rem;
+}
+
+.result-safe {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.result-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    color: gray;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Load model
-model = pickle.load(
-    open(
-        "phishing_url_model.pkl",
-        "rb"
-    )
+model = pickle.load(open("phishing_url_model.pkl", "rb"))
+
+# Header
+st.markdown('<div class="title">🛡️ Phishing Website Detector</div>',
+            unsafe_allow_html=True)
+
+st.markdown(
+    '<div class="subtitle">Check whether a website is legitimate or phishing</div>',
+    unsafe_allow_html=True
 )
 
-st.title("🔒 Phishing Website Detection")
-
-st.write(
-    "Enter a URL to determine whether it is phishing or legitimate."
-)
-
+# Input
 url = st.text_input(
-    "Website URL"
+    "Enter Website URL",
+    placeholder="https://example.com"
 )
 
-if st.button("Check Website"):
+# Button
+if st.button("🔍 Analyze Website", use_container_width=True):
 
-    if url == "":
-        st.warning(
-            "Please enter a URL."
-        )
-
-    elif not url.startswith(("http://", "https://")):
-        st.error(
-            "Please enter a valid URL starting with http:// or https://"
-        )
-
+    if not url:
+        st.warning("Please enter a URL.")
     else:
 
         features = extract_features(url)
 
         prediction = model.predict([features])
 
+        st.markdown("### Analysis Result")
+
         if prediction[0] == 1:
-            st.error(
-                "⚠️ Phishing Website Detected"
+            st.markdown(
+                '<div class="result-danger">⚠️ Phishing Website Detected</div>',
+                unsafe_allow_html=True
             )
         else:
-            st.success(
-                "✅ Legitimate Website"
+            st.markdown(
+                '<div class="result-safe">✅ Legitimate Website</div>',
+                unsafe_allow_html=True
             )
 
-        st.subheader("Extracted Features")
-
-        feature_names = [
-            "UsingIP",
-            "LongURL",
-            "ShortURL",
-            "Symbol@",
-            "Redirecting//",
-            "PrefixSuffix-",
-            "SubDomains",
-            "HTTPS",
-            "HTTPSDomainURL",
-            "InfoEmail",
-            "AbnormalURL"
-        ]
-
-        df_features = pd.DataFrame({
-            "Feature": feature_names,
-            "Value": features
-        })
-
-        st.dataframe(
-            df_features,
-            hide_index=True
-        )
+# Footer
+st.markdown("""
+<div class="footer">
+Built with ❤️ using Python, Streamlit and Machine Learning
+</div>
+""", unsafe_allow_html=True)
